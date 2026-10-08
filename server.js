@@ -23,6 +23,32 @@ app.post("/ideas", (req, res) => {
   res.json(newIdea);
 });
 
-app.listen(3001, () => {
-  console.log("サーバー起動: http://localhost:3001");
+// 編集
+app.put("/ideas/:id", (req, res) => {
+  const index = ideas.findIndex((i) => i.id === req.params.id);
+  if (index === -1) {
+    return res.status(404).json({ error: "not found" });
+  }
+  ideas[index] = {
+    ...ideas[index],
+    ...req.body,
+    id: ideas[index].id,
+    createdAt: ideas[index].createdAt,
+  };
+  res.json(ideas[index]);
+});
+
+// 削除
+app.delete("/ideas/:id", (req, res) => {
+  const before = ideas.length;
+  ideas = ideas.filter((i) => i.id !== req.params.id);
+  if (ideas.length === before) {
+    return res.status(404).json({ error: "not found" });
+  }
+  res.json({ ok: true });
+});
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`サーバー起動: ${PORT}`);
 });
